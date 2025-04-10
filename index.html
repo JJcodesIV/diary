@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reflective Journal - AI-powered Diary App</title>
+    <style>
+        :root {
+            --primary-color: #6a8caf;
+            --secondary-color: #e8f4f8;
+            --accent-color: #d16ba5;
+            --text-color: #333;
+            --light-text: #666;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .app-container {
+                grid-template-columns: 3fr 2fr;
+            }
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .card h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card h2 i {
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+        
+        textarea, input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+        
+        textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #5a7b9e;
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .mood-selector {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .mood-option {
+            background: var(--secondary-color);
+            border: 2px solid transparent;
+            border-radius: var(--border-radius);
+            padding: 10px;
+            cursor: pointer;
+            text-align: center;
+            flex: 1;
+            min-width: 60px;
+            margin: 0 5px 5px 0;
+            transition: all 0.2s;
+        }
+        
+        .mood-option:hover {
+            background: #d9e6f2;
+        }
+        
+        .mood-option.selected {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .ai-reflections, .ai-exercises {
+            background: var(--secondary-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-top: 15px;
+        }
+        
+        .ai-reflections p, .ai-exercises p {
+            margin-bottom: 10px;
+        }
+        
+        .ai-reflections h3, .ai-exercises h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .journal-history {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .journal-entry {
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+            cursor: pointer;
+        }
+        
+        .journal-entry:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .journal-entry h3 {
+            font-size: 1rem;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .journal-entry p {
+            color: var(--light-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .mood-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: white;
+            background-color: var(--primary-color);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 200px;
+            width: 100%;
+            margin-top: 15px;
+        }
+        
+        .chart-container .bar {
+            position: absolute;
+            bottom: 0;
+            width: 30px;
+            background-color: var(--primary-color);
+            border-radius: 3px 3px 0 0;
+            transition: height 0.5s;
+        }
+        
+        .chart-container .label {
+            position: absolute;
+            bottom: -25px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--light-text);
+        }
+        
+        .exercise-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: var(--border-radius);
+            border-left: 3px solid var(--accent-color);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .ai-thinking {
+            display: flex;
+            align-items: center;
+            color: var(--light-text);
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .ai-thinking .loading {
+            margin-right: 10px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            background: #f0f0f0;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background: white;
+            border-top: 3px solid var(--primary-color);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-book-open"></i> Reflective Journal</h1>
+        <p>AI-powered journaling for mindfulness and self-reflection</p>
+    </header>
+    
+    <div class="app-container">
+        <div class="left-column">
+            <div class="card">
+                <h2><i class="fas fa-pen"></i> New Journal Entry</h2>
+                <div>
+                    <label for="entry-title">Title</label>
+                    <input type="text" id="entry-title" placeholder="Give your entry a title">
+                    
+                    <label for="entry-content">What's on your mind today?</label>
+                    <textarea id="entry-content" placeholder="Start writing your thoughts here..."></textarea>
+                    
+                    <div>
+                        <label>How are you feeling?</label>
+                        <div class="mood-selector">
+                            <div class="mood-option" data-mood="Joyful">😄<br>Joyful</div>
+                            <div class="mood-option" data-mood="Calm">😌<br>Calm</div>
+                            <div class="mood-option" data-mood="Tired">😪<br>Tired</div>
+                            <div class="mood-option" data-mood="Anxious">😰<br>Anxious</div>
+                            <div class="mood-option" data-mood="Sad">😢<br>Sad</div>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button id="save-entry"><i class="fas fa-save"></i> Save Entry</button>
+                        <button id="generate-reflections"><i class="fas fa-lightbulb"></i> Generate Reflections</button>
+                    </div>
+                </div>
+                
+                <div id="ai-thinking" class="ai-thinking hidden">
+                    <div class="loading"></div> AI is analyzing your entry...
+                </div>
+                
+                <div id="ai-reflections" class="ai-reflections hidden">
+                    <h3>Reflective Questions</h3>
+                    <div id="reflective-questions"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-chart-line"></i> Mood Insights</h2>
+                <p>Track how your mood changes over time</p>
+                <div class="chart-container" id="mood-chart">
+                    <!-- Mood chart will be generated here -->
+                </div>
+                <p id="mood-analysis" class="ai-reflections" style="margin-top: 30px;">
+                    Your mood has been relatively balanced this week. You've experienced more joyful moments compared to last week.
+                </p>
+            </div>
+        </div>
+        
+        <div class="right-column">
+            <div class="card">
+                <h2><i class="fas fa-spa"></i> Personalized Practices</h2>
+                <div class="tabs">
+                    <div class="tab active" data-tab="gratitude">Gratitude</div>
+                    <div class="tab" data-tab="mindfulness">Mindfulness</div>
+                </div>
+                
+                <div class="tab-content active" id="gratitude-content">
+                    <p>Based on your recent entries, here are some gratitude exercises:</p>
+                    <div class="ai-exercises">
+                        <div class="exercise-item">
+                            <h3>Appreciation Reflection</h3>
+                            <p>Take a moment to write down three positive interactions you've had with others this week.</p>
+                        </div>
+                        <div class="exercise-item">
+                            <h3>Nature Connection</h3>
+                            <p>You mentioned enjoying the outdoors in your entries. Take 5 minutes today to appreciate a natural element around you.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="mindfulness-content">
+                    <p>Personalized mindfulness exercises for you:</p>
+                    <div class="ai-exercises">
+                        <div class="exercise-item">
+                            <h3>Breathing Exercise</h3>
+                            <p>Try 5 minutes of deep breathing to help with the anxiety you mentioned in recent entries.</p>
+                        </div>
+                        <div class="exercise-item">
+                            <h3>Present Moment Awareness</h3>
+                            <p>Next time you feel overwhelmed, focus on naming 5 things you can see, 4 things you can touch, 3 things you can hear, 2 things you can smell, and 1 thing you can taste.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-history"></i> Journal History</h2>
+                <div class="journal-history" id="journal-history">
+                    <!-- Journal entries will be listed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample reflective questions based on common themes
+        const reflectiveQuestions = {
+            work: [
+                "What aspect of your work brought you the most satisfaction today?",
+                "How did you handle challenges at work? What would you do differently?",
+                "What skills are you developing in your current role?",
+                "How does your work align with your long-term goals?"
+            ],
+            relationships: [
+                "How did your interactions with others affect your mood today?",
+                "Was there a conversation that had a significant impact on you? Why?",
+                "How did you show care for important people in your life today?",
+                "What relationship would you like to nurture more in the coming days?"
+            ],
+            stress: [
+                "What were your main sources of stress today?",
+                "Which coping mechanisms helped you manage stress?",
+                "What is one thing you could do tomorrow to reduce your stress level?",
+                "How has stress affected your physical and mental wellbeing?"
+            ],
+            growth: [
+                "What did you learn about yourself today?",
+                "How did you step out of your comfort zone?",
+                "What's a small win you achieved today that you're proud of?",
+                "What habit would you like to develop or improve?"
+            ],
+            general: [
+                "What brought you joy today?",
+                "What are you grateful for right now?",
+                "How did your actions today align with your values?",
+                "What would make tomorrow great?"
+            ]
+        };
+
+        // Sample gratitude exercises
+        const gratitudeExercises = [
+            {
+                title: "Three Good Things",
+                description: "Write down three things that went well today and reflect on why they happened."
+            },
+            {
+                title: "Gratitude Letter",
+                description: "Write a letter expressing gratitude to someone who has positively impacted your life, even if you don't send it."
+            },
+            {
+                title: "Appreciation Moments",
+                description: "Set aside time each day to appreciate small moments - a delicious meal, a kind gesture, or a beautiful view."
+            },
+            {
+                title: "Gratitude Jar",
+                description: "Write down something you're grateful for each day on a small piece of paper and collect them in a jar to read later."
+            },
+            {
+                title: "Sensory Gratitude",
+                description: "Focus on something you're grateful for from each of your five senses."
+            }
+        ];
+
+        // Sample mindfulness exercises
+        const mindfulnessExercises = [
+            {
+                title: "5-Minute Breathing",
+                description: "Focus on your breath for 5 minutes. When your mind wanders, gently bring it back to your breathing."
+            },
+            {
+                title: "Body Scan",
+                description: "Gradually focus your attention from your toes to the top of your head, noticing sensations without judgment."
+            },
+            {
+                title: "Mindful Walking",
+                description: "Take a 10-minute walk focusing completely on each step and the sensations in your body."
+            },
+            {
+                title: "Mindful Eating",
+                description: "Eat a meal without distractions, focusing on the taste, texture, and smell of each bite."
+            },
+            {
+                title: "Thought Observation",
+                description: "Spend 5 minutes observing your thoughts without engaging with them, like watching clouds pass in the sky."
+            }
+        ];
+
+        // Sample journal entries
+        let journalEntries = [
+            {
+                id: 1,
+                title: "Productive Monday",
+                content: "Today was surprisingly productive. I finished the project I've been procrastinating on for weeks. Feeling accomplished but tired.",
+                date: "2025-04-05",
+                mood: "Joyful"
+            },
+            {
+                id: 2,
+                title: "Stress at Work",
+                content: "My manager added more tasks to my already full plate. Feeling overwhelmed but trying to stay positive. Took a walk during lunch which helped.",
+                date: "2025-04-04",
+                mood: "Anxious"
+            },
+            {
+                id: 3,
+                title: "Coffee with Sarah",
+                content: "Had a great catch-up with Sarah today. It's been months since we properly talked. She always gives the best advice.",
+                date: "2025-04-02",
+                mood: "Calm"
+            },
+            {
+                id: 4,
+                title: "Feeling Low",
+                content: "Just one of those days where nothing seems to go right. Need to remember this feeling will pass too.",
+                date: "2025-03-30",
+                mood: "Sad"
+            },
+            {
+                id: 5,
+                title: "Too Much Going On",
+                content: "Between work deadlines and family obligations, I barely had time to breathe today. Need to schedule better next week.",
+                date: "2025-03-28",
+                mood: "Tired"
+            }
+        ];
+
+        // DOM elements
+        const entryTitleInput = document.getElementById('entry-title');
+        const entryContentInput = document.getElementById('entry-content');
+        const moodOptions = document.querySelectorAll('.mood-option');
+        const saveEntryButton = document.getElementById('save-entry');
+        const generateReflectionsButton = document.getElementById('generate-reflections');
+        const aiThinking = document.getElementById('ai-thinking');
+        const aiReflections = document.getElementById('ai-reflections');
+        const reflectiveQuestionsContainer = document.getElementById('reflective-questions');
+        const journalHistoryContainer = document.getElementById('journal-history');
+        const moodChartContainer = document.getElementById('mood-chart');
+        const tabs = document.querySelectorAll('.tab');
+        
+        // Selected mood
+        let selectedMood = null;
+
+        // Initialize the application
+        function init() {
+            // Set up event listeners
+            moodOptions.forEach(option => {
+                option.addEventListener('click', () => selectMood(option));
+            });
+            
+            saveEntryButton.addEventListener('click', saveEntry);
+            generateReflectionsButton.addEventListener('click', generateReflections);
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => switchTab(tab));
+            });
+            
+            // Render initial data
+            renderJournalHistory();
+            renderMoodChart();
+            
+            // Load from localStorage if available
+            // loadFromLocalStorage();
+        }
+
+        // Select mood
+        function selectMood(option) {
+            moodOptions.forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+            selectedMood = option.dataset.mood;
+        }
+
+        // Save journal entry
+        function saveEntry() {
+            const title = entryTitleInput.value.trim();
+            const content = entryContentInput.value.trim();
+            
+            if (!title || !content) {
+                alert('Please enter a title and content for your journal entry');
+                return;
+            }
+            
+            if (!selectedMood) {
+                alert('Please select a mood for your entry');
+                return;
+            }
+            
+            const newEntry = {
+                id: Date.now(),
+                title,
+                content,
+                date: new Date().toISOString().split('T')[0],
+                mood: selectedMood
+            };
+            
+            journalEntries.unshift(newEntry);
+            
+            // Reset form
+            entryTitleInput.value = '';
+            entryContentInput.value = '';
+            moodOptions.forEach(opt => opt.classList.remove('selected'));
+            selectedMood = null;
+            
+            // Update UI
+            renderJournalHistory();
+            renderMoodChart();
+            
+            // Show success message
+            alert('Journal entry saved successfully!');
+            
+            // Generate reflections automatically
+            generateReflections();
+        }
+
+        // Generate AI reflections
+        function generateReflections() {
+            const content = entryContentInput.value.trim();
+            
+            if (!content) {
+                alert('Please write some content in your journal entry');
+                return;
+            }
+            
+            // Show thinking indicator
+            aiThinking.classList.remove('hidden');
+            aiReflections.classList.add('hidden');
+            
+            // Simulate AI processing
+            setTimeout(() => {
+                // Hide thinking indicator
+                aiThinking.classList.add('hidden');
+                aiReflections.classList.remove('hidden');
+                
+                // Generate relevant questions
+                const questions = analyzeContentForQuestions(content);
+                
+                // Display questions
+                reflectiveQuestionsContainer.innerHTML = '';
+                questions.forEach(question => {
+                    const p = document.createElement('p');
+                    p.textContent = question;
+                    reflectiveQuestionsContainer.appendChild(p);
+                });
+                
+                // Update personalized exercises
+                updatePersonalizedExercises(content);
+            }, 1500);
+        }
+
+        // Analyze content and return appropriate reflective questions
+        function analyzeContentForQuestions(content) {
+            content = content.toLowerCase();
+            const questions = [];
+            
+            // Simple keyword matching for demonstration
+            if (content.includes('work') || content.includes('job') || content.includes('boss') || content.includes('colleague')) {
+                questions.push(...getRandomItems(reflectiveQuestions.work, 2));
+            }
+            
+            if (content.includes('friend') || content.includes('family') || content.includes('partner') || content.includes('relationship')) {
+                questions.push(...getRandomItems(reflectiveQuestions.relationships, 2));
+            }
+            
+            if (content.includes('stress') || content.includes('anxious') || content.includes('worry') || content.includes('overwhelm')) {
+                questions.push(...getRandomItems(reflectiveQuestions.stress, 2));
+            }
+            
+            if (content.includes('learn') || content.includes('growth') || content.includes('improve') || content.includes('goal')) {
+                questions.push(...getRandomItems(reflectiveQuestions.growth, 2));
+            }
+            
+            // Add general questions if we don't have enough
+            if (questions.length < 3) {
+                questions.push(...getRandomItems(reflectiveQuestions.general, 3 - questions.length));
+            }
+            
+            return questions;
+        }
+
+        // Update personalized exercises based on content
+        function updatePersonalizedExercises(content) {
+            content = content.toLowerCase();
+            
+            // Gratitude exercises
+            const gratitudeContainer = document.getElementById('gratitude-content');
+            const gratitudeExercisesDiv = gratitudeContainer.querySelector('.ai-exercises');
+            gratitudeExercisesDiv.innerHTML = '';
+            
+            const selectedGratitudeExercises = getRandomItems(gratitudeExercises, 2);
+            selectedGratitudeExercises.forEach(exercise => {
+                const div = document.createElement('div');
+                div.className = 'exercise-item';
+                div.innerHTML = `
+                    <h3>${exercise.title}</h3>
+                    <p>${exercise.description}</p>
+                `;
+                gratitudeExercisesDiv.appendChild(div);
+            });
+            
+            // Mindfulness exercises
+            const mindfulnessContainer = document.getElementById('mindfulness-content');
+            const mindfulnessExercisesDiv = mindfulnessContainer.querySelector('.ai-exercises');
+            mindfulnessExercisesDiv.innerHTML = '';
+            
+            const selectedMindfulnessExercises = getRandomItems(mindfulnessExercises, 2);
+            selectedMindfulnessExercises.forEach(exercise => {
+                const div = document.createElement('div');
+                div.className = 'exercise-item';
+                div.innerHTML = `
+                    <h3>${exercise.title}</h3>
+                    <p>${exercise.description}</p>
+                `;
+                mindfulnessExercisesDiv.appendChild(div);
+            });
+        }
+
+        // Render journal history
+        function renderJournalHistory() {
+            journalHistoryContainer.innerHTML = '';
+            
+            if (journalEntries.length === 0) {
+                journalHistoryContainer.innerHTML = '<p>No journal entries yet. Start writing!</p>';
+                return;
+            }
+            
+            journalEntries.forEach(entry => {
+                const entryElement = document.createElement('div');
+                entryElement.className = 'journal-entry';
+                entryElement.innerHTML = `
+                    <h3>
+                        ${entry.title}
+                        <span class="mood-tag">${entry.mood}</span>
+                    </h3>
+                    <p>${formatDate(entry.date)}</p>
+                    <p>${truncateText(entry.content, 60)}</p>
+                `;
+                
+                entryElement.addEventListener('click', () => viewEntry(entry));
+                journalHistoryContainer.appendChild(entryElement);
+            });
+        }
+
+        // Render mood chart
+        function renderMoodChart() {
+            moodChartContainer.innerHTML = '';
+            
+            if (journalEntries.length === 0) {
+                moodChartContainer.innerHTML = '<p>No mood data available yet.</p>';
+                return;
+            }
+            
+            // Get last 7 entries or less
+            const entries = journalEntries.slice(0, 7).reverse();
+            
+            // Create chart
+            const chartWidth = moodChartContainer.offsetWidth;
+            const barWidth = Math.min(30, (chartWidth / entries.length) - 10);
+            const spacing = (chartWidth - (barWidth * entries.length)) / (entries.length + 1);
+            
+            // Define mood values (1-5)
+            const moodValues = {
+                'Joyful': 5,
+                'Calm': 4,
+                'Tired': 3,
+                'Anxious': 2,
+                'Sad': 1
+            };
+            
+            entries.forEach((entry, index) => {
+                const moodValue = moodValues[entry.mood];
+                const height = moodValue * 30; // Scale height
+                
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = `${height}px`;
+                bar.style.left = `${spacing + (index * (barWidth + spacing))}px`;
+                bar.style.width = `${barWidth}px`;
+                
+                // Customize color based on mood
+                if (entry.mood === 'Joyful') bar.style.backgroundColor = '#4CAF50';
+                if (entry.mood === 'Calm') bar.style.backgroundColor = '#2196F3';
+                if (entry.mood === 'Tired') bar.style.backgroundColor = '#FF9800';
+                if (entry.mood === 'Anxious') bar.style.backgroundColor = '#F44336';
+                if (entry.mood === 'Sad') bar.style.backgroundColor = '#9C27B0';
+                
+                const label = document.createElement('div');
+                label.className = 'label';
+                label.style.width = `${barWidth}px`;
+                label.style.left = `${spacing + (index * (barWidth + spacing))}px`;
+                label.textContent = formatDateShort(entry.date);
+                
+                moodChartContainer.appendChild(bar);
+                moodChartContainer.appendChild(label);
+            });
+            
+            // Update mood analysis
+            updateMoodAnalysis(entries);
+        }
+
+        // Update mood analysis text
+        function updateMoodAnalysis(entries) {
+            const moodAnalysis = document.getElementById('mood-analysis');
+            
+            if (entries.length < 2) {
+                moodAnalysis.textContent = "Keep journaling to see mood trends and analysis.";
+                return;
+            }
+            
+            // Simple mood analysis for demonstration
+            const moodCounts = {
+                'Joyful': 0,
+                'Calm': 0,
+                'Tired': 0,
+                'Anxious': 0,
+                'Sad': 0
+            };
+            
+            entries.forEach(entry => {
+                moodCounts[entry.mood]++;
+            });
+            
+            // Find dominant mood
+            let dominantMood = 'Neutral';
+            let maxCount = 0;
+            
+            for (const mood in moodCounts) {
+                if (moodCounts[mood] > maxCount) {
+                    maxCount = moodCounts[mood];
+                    dominantMood = mood;
+                }
+            }
+            
+            // Create analysis text
+            let analysisText = `Your predominant mood recently has been <strong>${dominantMood}</strong>. `;
+            
+            if (dominantMood === 'Joyful' || dominantMood === 'Calm') {
+                analysisText += "You've been experiencing mostly positive emotions. Keep doing what's working for you!";
+            } else if (dominantMood === 'Tired') {
+                analysisText += "You've been feeling tired lately. Consider prioritizing rest and self-care.";
+            } else {
+                analysisText += "You've been experiencing some challenging emotions. Consider using the mindfulness exercises to help manage these feelings.";
+            }
+            
+            moodAnalysis.innerHTML = analysisText;
+        }
+
+        // View a specific entry
+        function viewEntry(entry) {
+            entryTitleInput.value = entry.title;
+            entryContentInput.value = entry.content;
+            
+            // Select the mood
+            moodOptions.forEach(option => {
+                if (option.dataset.mood === entry.mood) {
+                    selectMood(option);
+                }
+            });
+            
+            // Scroll to entry form
+            document.querySelector('.left-column').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Switch between tabs
+        function switchTab(tab) {
+            // Update tab state
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            // Show corresponding content
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            const activeContent = document.getElementById(`${tab.dataset.tab}-content`);
+            activeContent.classList.add('active');
+        }
+
+        // Helper function to get random items from array
+        function getRandomItems(array, count) {
+            const shuffled = [...array].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+
+        // Helper function to format date
+        function formatDate(dateString) {
+            const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        // Helper function to format date (short)
+        function formatDateShort(dateString) {
+            const date = new Date(dateString);
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+        }
+
+        // Helper function to truncate text
+        function truncateText(text, maxLength) {
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
